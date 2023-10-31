@@ -1,1 +1,66 @@
+class RobotFinancialAdvisor:
+    def __init__(self):
+        self.categories = {
+            1: "Gas",
+            2: "Food",
+            3: "Bills",
+            # Add more categories as needed
+        }
+        self.weekly_spending = {category: [0] * 7 for category in self.categories.values()}
+
+    def start_tracking(self):
+        print("Welcome to Robot Financial Advisor!")
+        print("Let's start tracking your spending for the week.")
+
+        for day in range(7):
+            print(f"\nDay {day + 1}:")
+            for category_id, category_name in self.categories.items():
+                while True:
+                    try:
+                        spent = float(input(f"How much did you spend on {category_name} today? $"))
+                        if spent < 0:
+                            print("Please enter a positive amount.")
+                        else:
+                            self.weekly_spending[category_name][day] = spent
+                            break
+                    except ValueError:
+                        print("Invalid input. Please enter a valid amount.")
+
+    def get_total_spent_for_category(self, category):
+        total_spent = sum(self.weekly_spending[category])
+        return total_spent
+
+    def get_total_spent_for_day(self, day):
+        total_spent = sum([self.weekly_spending[category][day - 1] for category in self.categories.values()])
+        return total_spent
+
+    def get_day_with_most_spending(self):
+        total_per_day = [sum(self.weekly_spending[category][day]) for day in range(7)]
+        max_spending = max(total_per_day)
+        day_max_spending = total_per_day.index(max_spending) + 1
+        return day_max_spending
+
+    def get_category_with_most_spending(self):
+        total_per_category = {category: sum(spending) for category, spending in self.weekly_spending.items()}
+        max_spending_category = max(total_per_category, key=total_per_category.get)
+        return max_spending_category
+
+
+if __name__ == "__main__":
+    robot_advisor = RobotFinancialAdvisor()
+    robot_advisor.start_tracking()
+
+    # Example usage:
+    gas_total = robot_advisor.get_total_spent_for_category("Gas")
+    print(f"Total spent on Gas this week: ${gas_total:.2f}")
+
+    day_to_check = 4  # Example: checking spending for Day 4
+    day_total = robot_advisor.get_total_spent_for_day(day_to_check)
+    print(f"Total spent on Day {day_to_check}: ${day_total:.2f}")
+
+    day_most_spent = robot_advisor.get_day_with_most_spending()
+    print(f"The day with the most spending: Day {day_most_spent}")
+
+    category_most_spent = robot_advisor.get_category_with_most_spending()
+    print(f"The category with the most spending this week: {category_most_spent}")
 
