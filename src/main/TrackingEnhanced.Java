@@ -1,5 +1,7 @@
 package main;
 
+import basic.Category;
+
 import java.util.Scanner;
 
 /**
@@ -109,14 +111,33 @@ public class TrackingEnhanced {
         }
     }
 
+    /*
+    * addValue() method
+    * Adds a value to an array, pretty simple.
+    *
+    * Example Use 1:
+    * addValue(Category[]{...},1,1)
+    * */
+    public static Category[] addValue(Category[] array,int size,Category val){
+        // Create new array of size+1
+        Category[] newArray = new Category[size+1];
+        // insert the previous elements of the array into the new array
+        for(int i=0;i<size;i++){
+            newArray[i] = array[i];
+        }
+        // set arrays last value to val.
+        newArray[size] = val;
+        // return new array
+        return  newArray;
+    }
+
     // Main Method Based on previous version
     public static void main(String[] args){
         // Declare Variables
         Scanner input = new Scanner(System.in);
         boolean running = true;
+        Category[] categories = {new Category("Gas"), new Category("Food")};
         int day;
-        double totalGas = 0; // Total spent on Gas
-        double totalFood = 0; // Total spent on Food
         String highestDay = ""; // Day in which most money was spent.
         double highestTotal = 0; // Highest Amount spent
         double[] totals = {0,0,0,0,0,0,0}; // Array with totals. 0 being monday, 6 being sunday.
@@ -133,34 +154,39 @@ public class TrackingEnhanced {
                     running = false;
                     break;
                 case 1,2,3,4,5,6,7: // If day is in [1,7] go as intended
+                    // Total Spent Today
+                    double totalToday = 0;
+                    // Preset Gas and Food
+                    Category gas = categories[0];
+                    Category food = categories[1];
 
-                    // Temporary values
-                    double gas;
-                    double food;
-
-
-                    // Start with gas.
-                    System.out.println("Enter how much you have spent in gas. Type 0 if none.");
-                    double maxNumber = Double.MAX_VALUE;
-                    gas = getInputWithinBounds(input,0.0,maxNumber);
-
-                    // Now do food.
-                    System.out.println("Enter how much you have spent in food. Type 0 if none.");
-                    food = getInputWithinBounds(input,0.0,maxNumber);
-
-                    // Add gas and food to the total
-                    totalGas+=gas;
-                    totalFood+=food;
-
-                    // Check if gas and food combined is larger than the current highest total spent.
-                    if((food+gas)>highestTotal){
-                        // Set Highest Total to food and gas combined
-                        highestTotal = food+gas;
-                        highestDay = getDay(day); // Set highest day to the current day.
+                    // For loop to create categories
+                    while (true){
+                        System.out.println("What would you like to name this category? (TYPE 0 to end.)");
+                        String response = input.next();
+                        if(response.trim().equals("0")){
+                           break;
+                        }else{
+                            Category newCat = new Category(response);
+                            categories = addValue(categories,categories.length,newCat);
+                        }
+                    }
+                    // Go through all categories and ask the user how much they spent on it.
+                    for(int i=0; i<categories.length;i++){
+                        System.out.println("Enter how much you've spent on "+categories[i].getName()+". Type 0 if none.");
+                        // Will set the total for said category to however much is spent.
+                        double spent = getInputWithinBounds(input,0.0,Double.MAX_VALUE);
+                        categories[i].setTotal(spent);
+                        totalToday+=spent;
+                    }
+                    // Check if total spent today is highest
+                    if(totalToday>highestTotal){
+                        highestTotal = totalToday;
+                        highestDay = getDay(day);
                     }
 
                     // Set total for today in the array.
-                    totals[day-1] = (food+gas); // totals[0] is monday (0=1-1)
+                    totals[day-1] = totalToday;
 
                     // Print Separator
                     System.out.println("-".repeat(20));
@@ -180,13 +206,18 @@ public class TrackingEnhanced {
         // Get and Print the day the user spent the most, and how much was spent.
         System.out.println("On "+highestDay+", you spent the most. ($"+highestTotal+")");
         System.out.println(" ");
-        // See which category the user has spent the most on, food or gas.
-        if(totalGas > totalFood){ // If gas is highest
-            System.out.println("Gas is the highest category, at: $"+totalGas);
-        }else if(totalGas < totalFood){ // If food is highest
-            System.out.println("Food is the highest category, at: $"+totalFood);
-        }else{ // if neither are highest (equal)
-            System.out.println("Gas and Food are equal, at: $"+totalGas);
+        // See which category the user has spent the most on
+        double highestSpentCategory = 0;
+        Category highestCategory = new Category("None");
+
+        for(int i=0; i<categories.length;i++){
+            if(categories[i].getTotal()>highestSpentCategory){
+                highestCategory = categories[i];
+            }
         }
+        // Print
+        System.out.println(highestCategory.getName()+" is the highest category, at: $"+highestCategory.getTotal());
+
+
     }
 }
