@@ -1,6 +1,7 @@
 package main;
 
 import basic.Category;
+import basic.FinanceHandler;
 
 import java.util.Scanner;
 
@@ -136,17 +137,32 @@ public class TrackingEnhanced {
         // Declare Variables
         Scanner input = new Scanner(System.in);
         boolean running = true;
-        Category[] categories = {new Category("Gas"), new Category("Food")};
+        boolean canCreateCats = true;
+        FinanceHandler handler = new FinanceHandler();
         int day;
-        String highestDay = ""; // Day in which most money was spent.
-        double highestTotal = 0; // Highest Amount spent
-        double[] totals = {0,0,0,0,0,0,0}; // Array with totals. 0 being monday, 6 being sunday.
+
 
         // While Loop for continuous use.
         while (running){
+            // For loop to create categories
+            if(canCreateCats){
+                System.out.println("Lets create some Spending Categories. ");
+                while (true){
+                    System.out.println("What would you like to name this category? (TYPE 0 to end.)");
+                    String response = input.next();
+                    if(response.trim().equals("0")){
+                        canCreateCats = false;
+                        break;
+                    }else{
+                        handler.addCategory(response);
+                    }
+                }
+            }
+
             // Use GetInput Method
             day = getDayInput(input);
             // Switch Statements
+
             switch (day){
                 default: // If 0 is passed, then Exit Program
                     // Note: This won't fire for values other than 0 due to the getInputWithinBounds() method.
@@ -154,39 +170,13 @@ public class TrackingEnhanced {
                     running = false;
                     break;
                 case 1,2,3,4,5,6,7: // If day is in [1,7] go as intended
-                    // Total Spent Today
-                    double totalToday = 0;
-                    // Preset Gas and Food
-                    Category gas = categories[0];
-                    Category food = categories[1];
-
-                    // For loop to create categories
-                    while (true){
-                        System.out.println("What would you like to name this category? (TYPE 0 to end.)");
-                        String response = input.next();
-                        if(response.trim().equals("0")){
-                           break;
-                        }else{
-                            Category newCat = new Category(response);
-                            categories = addValue(categories,categories.length,newCat);
-                        }
-                    }
                     // Go through all categories and ask the user how much they spent on it.
-                    for(int i=0; i<categories.length;i++){
-                        System.out.println("Enter how much you've spent on "+categories[i].getName()+". Type 0 if none.");
+                    for(int i=0; i<handler.categories.length;i++){
+                        System.out.println("Enter how much you've spent on "+handler.categories[i].getName()+". Type 0 if none.");
                         // Will set the total for said category to however much is spent.
                         double spent = getInputWithinBounds(input,0.0,Double.MAX_VALUE);
-                        categories[i].setTotal(spent);
-                        totalToday+=spent;
+                        handler.set(day-1,i,spent);
                     }
-                    // Check if total spent today is highest
-                    if(totalToday>highestTotal){
-                        highestTotal = totalToday;
-                        highestDay = getDay(day);
-                    }
-
-                    // Set total for today in the array.
-                    totals[day-1] = totalToday;
 
                     // Print Separator
                     System.out.println("-".repeat(20));
@@ -199,25 +189,17 @@ public class TrackingEnhanced {
         // Output after calculations
 
         // Go through the totals table and print out how much was spent that day.
-        for(int i=0;i<totals.length;i++){
-            System.out.println("The total that was spent on "+getDay(i+1)+" was $"+totals[i]);
+        for(int i=0;i<handler.totals.length;i++){
+            System.out.println("The total that was spent on "+getDay(i+1)+" was $"+handler.totals[i]);
         }
         System.out.println(" ");
         // Get and Print the day the user spent the most, and how much was spent.
-        System.out.println("On "+highestDay+", you spent the most. ($"+highestTotal+")");
+        System.out.println("On "+getDay(handler.getHighestDay()+1)+", you spent the most. ($"+handler.getHighestSpent()+")");
         System.out.println(" ");
         // See which category the user has spent the most on
-        double highestSpentCategory = 0;
-        Category highestCategory = new Category("None");
-
-        for(int i=0; i<categories.length;i++){
-            if(categories[i].getTotal()>highestSpentCategory){
-                highestCategory = categories[i];
-            }
-        }
         // Print
-        System.out.println(highestCategory.getName()+" is the highest category, at: $"+highestCategory.getTotal());
-
+        System.out.println(handler.getHighestCategory().getName()+" is the highest category, at: $"+handler.getHighestCategory().getTotal());
+        canCreateCats = true;
 
     }
 }
