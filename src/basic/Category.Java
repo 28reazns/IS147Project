@@ -5,7 +5,7 @@ public class Category {
     private String name;
 
     // Category total
-    private double total;
+    private double[] total = new double[7];
 
     /*
     * Category Method
@@ -19,11 +19,10 @@ public class Category {
     * */
     public Category(String name){
         this.name = name;
-        this.total = 0;
     }
 
     public Category(){
-        this.total = 0;
+
     }
 
     /*
@@ -50,12 +49,12 @@ public class Category {
     * Category cat2 = new Category("Testing");
     * cat2.setTotal(100.0);
     * */
-    public void setTotal(double total){
-        this.total = total;
+    public void setTotal(int day,double total){
+        this.total[day] = total;
     }
 
-    public void setTotal(int total){
-        this.total = (double) total;
+    public void setTotal(int day,int total){
+        this.total[day] = total;
     }
 
     /*
@@ -64,13 +63,26 @@ public class Category {
     *
     * Example Use 1:
     * Category cat1 = new Category("Testing");
-    * cat1.setTotal(100);
-    * cat1.getTotal(); -- Returns 100.0
+    * cat1.setTotal(1,100);
+    * cat1.getTotal(1); -- Returns 100.0
+    *
+    * Example Use 2:
+    * Category cat1 = new Category("Testing");
+    * cat1.setTotal(1,100);
+    * cat1.setTotal(2,150);
+    * cat1.getTotal(); -- Returns 250.0
     * */
     public double getTotal(){
-        return this.total;
+        double t = 0;
+        for (int i=0;i<this.total.length;i++){
+            t+=this.total[i];
+        }
+        return t;
     }
 
+    public double getTotal(int day){
+        return this.total[day];
+    }
     /*
      * getName Method
      * Will get the category's  name
@@ -97,6 +109,6 @@ public class Category {
     * Total: 1600.0
     * */
     @Override public String toString(){
-        return "Category: "+this.name+"\n"+"Total: "+this.total;
+        return "Category: "+this.name+"\n"+"Total: "+this.getTotal();
     }
 }
