@@ -103,9 +103,14 @@ public class FinanceHandler {
      * handler.set(3,1,50.0) - Sets the total spending on Gas for wednesday.
      * */
     public void set(int day, int catIndex, double spent){
-        // Increment total by double spent.
         this.categories[catIndex].setTotal(day, spent);
-        totals[day] += spent;
+
+        // Set total to combined total
+        double totalToday = 0;
+        for(int i=0;i<this.categories.length;i++){
+            totalToday += this.categories[i].getTotal(day);
+        }
+        totals[day] = totalToday;
 
         double highest = 0;
         int index = 0;
